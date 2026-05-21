@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1.0.1 | 2025-05-21 -->
+<!-- v1.0.2 | 2025-05-21 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -920,6 +920,9 @@ async function localBackupLoad(){
     if(!raw){ showToast('저장된 로컬 백업이 없어요'); return; }
     const snapshot = JSON.parse(raw);
     if(!confirm('로컬 백업을 불러오면 현재 Firebase 데이터 위에 덮어씌워집니다.\n계속할까요?\n\n백업 시각: ' + new Date(snapshot.savedAt).toLocaleString('ko-KR'))) return;
+    // Firebase에 전부 업로드
+    if(snapshot.records){
+      for(const [dateStr, rec] of Object.entries(snapshot.records)){
         await fbSetRecord(dateStr, rec);
       }
       records = snapshot.records;
