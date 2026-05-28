@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1.0.2 | 2025-05-21 -->
+<!-- v1.0.2 | 2025-05-28 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -148,7 +148,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
 .cal-cell.weekend .cal-num{color:#e5484d;}
 .cal-cell.voluntary-day{background:#eceef2 !important;}
 .cal-cell.voluntary-day.weekend{background:#eceef2 !important;}
-.cal-num{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:3px;}
+.cal-num{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:0;justify-content:space-between;}
 .cal-cell.today .cal-num{color:var(--text);font-weight:500;}
 .vol-mark{font-size:8px;color:var(--voluntary);font-family:var(--mono);}
 .cal-bars{display:flex;flex-direction:column;gap:3px;margin-bottom:4px;}
@@ -197,6 +197,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
 .save-settings-btn{width:100%;padding:10px;border:none;border-radius:9px;background:var(--text);color:#fff;font-family:var(--mono);font-size:12px;cursor:pointer;transition:opacity .15s;margin-top:4px;}
 .save-settings-btn:hover{opacity:.82;}
 
+
+/* DONE ICONS */
+.cal-done-wrap{display:flex;gap:3px;margin-left:auto;}
+.cal-done-dot{width:11px;height:11px;flex-shrink:0;}
+.done-check{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);user-select:none;transition:all .15s;margin-top:8px;}
+.done-check:hover{opacity:.8;}
+.done-check.checked-a{border-color:var(--a-dark);background:var(--a-light);color:var(--a-dark);font-weight:500;}
+.done-check.checked-b{border-color:var(--b-dark);background:var(--b-light);color:var(--b-dark);font-weight:500;}
+
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;font-family:var(--mono);font-size:11px;padding:7px 18px;border-radius:20px;transition:transform .3s;z-index:999;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -213,7 +222,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <div class="topbar-title">STUDY ATTENDANCE <span style="font-size:9px;color:var(--faint);letter-spacing:0;font-weight:400;">v1.0.1</span></div>
+    <div class="topbar-title">STUDY ATTENDANCE <span style="font-size:9px;color:var(--faint);letter-spacing:0;font-weight:400;">v1.0.2</span></div>
     <div class="sync-row">
       <span class="sync-dot load" id="sync-dot"></span>
       <span id="sync-text">연결 중...</span>
@@ -261,6 +270,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
           <div class="tg"><label>입장</label><input id="a-in" type="text" placeholder="09:00" maxlength="5" oninput="smartTime(this)" onblur="renderDaily()"></div>
           <div class="tg"><label>퇴장</label><input id="a-out" type="text" placeholder="12:00" maxlength="5" oninput="smartTime(this)" onblur="renderDaily()"></div>
         </div>
+        <div class="done-check" id="done-a" onclick="toggleDone('a')">☐ 오늘 목표 달성</div>
         <div class="pcard-footer" id="footer-a"></div>
       </div>
       <div class="pcard">
@@ -270,6 +280,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
           <div class="tg"><label>입장</label><input id="b-in" type="text" placeholder="09:00" maxlength="5" oninput="smartTime(this)" onblur="renderDaily()"></div>
           <div class="tg"><label>퇴장</label><input id="b-out" type="text" placeholder="12:00" maxlength="5" oninput="smartTime(this)" onblur="renderDaily()"></div>
         </div>
+        <div class="done-check" id="done-b" onclick="toggleDone('b')">☆ 오늘 목표 달성</div>
         <div class="pcard-footer" id="footer-b"></div>
       </div>
     </div>
@@ -337,12 +348,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
           <div class="setting-val"><input id="set-start-date" type="text" placeholder="2025-05-20" style="width:130px;font-size:12px;"></div>
         </div>
         <div class="setting-row">
-          <span class="setting-key">지각 기준 (이 시각 이후 입장)</span>
-          <div class="setting-val"><input id="set-late" type="text" placeholder="09:10" maxlength="5" oninput="smartTime(this)"></div>
+          <span class="setting-key" style="color:var(--a-dark)">A 지각 기준 (이 시각 이후 입장)</span>
+          <div class="setting-val"><input id="set-late-a" type="text" placeholder="09:10" maxlength="5" oninput="smartTime(this)"></div>
         </div>
         <div class="setting-row">
-          <span class="setting-key">조퇴 기준 (이 시각 이전 퇴장)</span>
-          <div class="setting-val"><input id="set-early" type="text" placeholder="10:00" maxlength="5" oninput="smartTime(this)"></div>
+          <span class="setting-key" style="color:var(--a-dark)">A 조퇴 기준 (이 시각 이전 퇴장)</span>
+          <div class="setting-val"><input id="set-early-a" type="text" placeholder="10:00" maxlength="5" oninput="smartTime(this)"></div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key" style="color:var(--b-dark)">B 지각 기준 (이 시각 이후 입장)</span>
+          <div class="setting-val"><input id="set-late-b" type="text" placeholder="09:10" maxlength="5" oninput="smartTime(this)"></div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key" style="color:var(--b-dark)">B 조퇴 기준 (이 시각 이전 퇴장)</span>
+          <div class="setting-val"><input id="set-early-b" type="text" placeholder="10:00" maxlength="5" oninput="smartTime(this)"></div>
         </div>
         <div class="setting-row">
           <span class="setting-key">타임라인 시작</span>
@@ -383,7 +402,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);}
       <button onclick="localBackupLoad()" style="font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;">불러오기</button>
     </div>
 
-  <div style="text-align:right;margin-top:16px;font-size:9px;font-family:var(--mono);color:var(--faint);">v1.0.1 · 2025-05-21</div>
+  <div style="text-align:right;margin-top:16px;font-size:9px;font-family:var(--mono);color:var(--faint);">v1.0.2 · 2025-05-28</div>
   </div><!-- /page-settings -->
 </div>
 <div class="toast" id="toast"></div>
@@ -408,15 +427,25 @@ const PALETTES = [
 
 // ── STATE ────────────────────────────────────────────
 const FALLBACK_START = '2025-05-20';
+// 5/19~5/27 픽스드 기준 (A,B 동일)
+const FIXED_HISTORY = [{
+  from: '2025-05-19',
+  to:   '2025-05-27',
+  lateA:'09:10', earlyA:'10:00',
+  lateB:'09:10', earlyB:'10:00',
+}];
 let records = {};
 let voluntary = {};
 let settings = {
   nameA:'참여자 A', nameB:'참여자 B',
-  lateAfter:'09:10', earlyBefore:'10:00',
+  lateAfterA:'09:10', earlyBeforeA:'10:00',
+  lateAfterB:'09:10', earlyBeforeB:'10:00',
   tlStart:'06:00', tlEnd:'12:00',
   paletteA:'blue', paletteB:'green',
   startDate: FALLBACK_START,
 };
+// 기준 시간 변경 이력: [{from, lateA, earlyA, lateB, earlyB}, ...]
+let settingsHistory = [];
 let currentDate = todayStr();
 let currentMonth = todayStr().slice(0,7);
 let pendingColorId = null;
@@ -426,6 +455,9 @@ async function fbGet(p){try{return window._dbGet?await window._dbGet(p):null;}ca
 async function fbSet(p,v){try{if(window._dbSet)await window._dbSet(p,v);}catch{}}
 // 날짜 하나씩 저장 — 전체 덮어쓰기 금지
 async function fbSetRecord(dateStr,rec){try{if(window._dbSet)await window._dbSet('records/'+dateStr,rec);}catch{}}
+// 단일 필드만 저장 — 동시 조작 충돌 방지
+async function fbSetField(dateStr,field,val){try{if(window._dbSet)await window._dbSet('records/'+dateStr+'/'+field,val);}catch{}}
+async function fbSetSettingsHistory(h){try{if(window._dbSet)await window._dbSet('settingsHistory',h);}catch{}}
 async function fbSetVoluntaryDay(dateStr,on){try{if(window._dbSet)await window._dbSet('voluntary/'+dateStr,on?true:null);}catch{}}
 function fbListen(p,cb){try{if(window._dbListen)window._dbListen(p,cb);}catch{}}
 
@@ -445,13 +477,32 @@ async function init(){
     setTimeout(()=>{if(!window._dbSet){setSyncStatus('cfg');document.getElementById('cfg-banner').style.display='block';resolve();}},4000);
   });
   if(window._dbGet){
-    const sv=await fbGet('settings'); if(sv) settings={...settings,...sv};
+    const sv=await fbGet('settings');
+    if(sv){
+      settings={...settings,...sv};
+      // 구버전(lateAfter/earlyBefore 공통) → 신버전(A/B 별도) 마이그레이션
+      if(!settings.lateAfterA)  settings.lateAfterA  = sv.lateAfter  || '09:10';
+      if(!settings.earlyBeforeA) settings.earlyBeforeA = sv.earlyBefore || '10:00';
+      if(!settings.lateAfterB)  settings.lateAfterB  = sv.lateAfter  || '09:10';
+      if(!settings.earlyBeforeB) settings.earlyBeforeB = sv.earlyBefore || '10:00';
+    }
     const rv=await fbGet('records');  if(rv) records=rv;
     const vv=await fbGet('voluntary');if(vv) voluntary=vv;
+    const sh=await fbGet('settingsHistory');if(sh) settingsHistory=sh;
     setSyncStatus('ok');
     fbListen('records',v=>{if(v){records=v;renderDaily();renderMonthly();}});
     fbListen('voluntary',v=>{voluntary=v||{};renderDaily();renderMonthly();});
-    fbListen('settings',v=>{if(v){settings={...settings,...v};applyAll();}});
+    fbListen('settingsHistory',v=>{settingsHistory=v||[];renderDaily();renderMonthly();});
+    fbListen('settings',v=>{
+      if(v){
+        settings={...settings,...v};
+        if(!settings.lateAfterA)  settings.lateAfterA  = v.lateAfter  || '09:10';
+        if(!settings.earlyBeforeA) settings.earlyBeforeA = v.earlyBefore || '10:00';
+        if(!settings.lateAfterB)  settings.lateAfterB  = v.lateAfter  || '09:10';
+        if(!settings.earlyBeforeB) settings.earlyBeforeB = v.earlyBefore || '10:00';
+        applyAll();
+      }
+    });
   }
   applyAll();
 }
@@ -473,6 +524,29 @@ function isVoluntary(ds){
   return false;
 }
 function needsAttendance(ds){return isPast(ds)&&!isVoluntary(ds);}
+
+// 특정 날짜에 적용되는 기준 시간 반환 (이력 기반)
+function getThresholds(dateStr){
+  // 1. 픽스드 기간 체크 (2025-05-19 ~ 2025-05-27)
+  for(const f of FIXED_HISTORY){
+    if(dateStr>=f.from && dateStr<=f.to){
+      return {lateA:f.lateA,earlyA:f.earlyA,lateB:f.lateB,earlyB:f.earlyB};
+    }
+  }
+  // 2. settingsHistory에서 해당 날짜 이전 가장 최근 이력 찾기
+  // 이력은 [{from, lateA, earlyA, lateB, earlyB}, ...]
+  const sorted=[...settingsHistory].sort((a,b)=>b.from.localeCompare(a.from));
+  for(const h of sorted){
+    if(dateStr>=h.from) return {lateA:h.lateA,earlyA:h.earlyA,lateB:h.lateB,earlyB:h.earlyB};
+  }
+  // 3. 현재 settings 기본값
+  return {
+    lateA:settings.lateAfterA||'09:10',
+    earlyA:settings.earlyBeforeA||'10:00',
+    lateB:settings.lateAfterB||'09:10',
+    earlyB:settings.earlyBeforeB||'10:00',
+  };
+}
 
 function badgeName(name){
   const n=(name||'').trim();
@@ -579,8 +653,10 @@ function applyNamesToUI(){
 function loadSettingsUI(){
   document.getElementById('set-name-a').value=settings.nameA;
   document.getElementById('set-name-b').value=settings.nameB;
-  document.getElementById('set-late').value=settings.lateAfter;
-  document.getElementById('set-early').value=settings.earlyBefore;
+  document.getElementById('set-late-a').value=settings.lateAfterA||'09:10';
+  document.getElementById('set-early-a').value=settings.earlyBeforeA||'10:00';
+  document.getElementById('set-late-b').value=settings.lateAfterB||'09:10';
+  document.getElementById('set-early-b').value=settings.earlyBeforeB||'10:00';
   document.getElementById('set-tl-start').value=settings.tlStart;
   document.getElementById('set-tl-end').value=settings.tlEnd;
   document.getElementById('set-start-date').value=settings.startDate||FALLBACK_START;
@@ -588,8 +664,18 @@ function loadSettingsUI(){
 async function saveSettings(){
   settings.nameA=document.getElementById('set-name-a').value||'참여자 A';
   settings.nameB=document.getElementById('set-name-b').value||'참여자 B';
-  settings.lateAfter=document.getElementById('set-late').value||'09:10';
-  settings.earlyBefore=document.getElementById('set-early').value||'10:00';
+  const newLateA=document.getElementById('set-late-a').value||'09:10';
+  const newEarlyA=document.getElementById('set-early-a').value||'10:00';
+  const newLateB=document.getElementById('set-late-b').value||'09:10';
+  const newEarlyB=document.getElementById('set-early-b').value||'10:00';
+  // 기준 시간이 바뀌었으면 이력에 추가
+  if(newLateA!==settings.lateAfterA||newEarlyA!==settings.earlyBeforeA||
+     newLateB!==settings.lateAfterB||newEarlyB!==settings.earlyBeforeB){
+    settingsHistory.push({from:todayStr(),lateA:newLateA,earlyA:newEarlyA,lateB:newLateB,earlyB:newEarlyB});
+    await fbSetSettingsHistory(settingsHistory);
+  }
+  settings.lateAfterA=newLateA; settings.earlyBeforeA=newEarlyA;
+  settings.lateAfterB=newLateB; settings.earlyBeforeB=newEarlyB;
   settings.tlStart=document.getElementById('set-tl-start').value||'06:00';
   settings.tlEnd=document.getElementById('set-tl-end').value||'12:00';
   settings.startDate=document.getElementById('set-start-date').value||FALLBACK_START;
@@ -637,11 +723,47 @@ function loadDate(){
   document.getElementById('b-in').value=rec.bIn||'';
   document.getElementById('b-out').value=rec.bOut||'';
   updateVolBtn();
+  updateDoneUI();
   renderDaily();
 }
 function clearDay(){['a-in','a-out','b-in','b-out'].forEach(id=>document.getElementById(id).value='');renderDaily();}
+
+function toggleDone(who){
+  const el=document.getElementById('done-'+who);
+  if(!el)return;
+  const rec=records[currentDate]||{};
+  const field=who==='a'?'aDone':'bDone';
+  rec[field]=!rec[field];
+  records[currentDate]=rec;
+  updateDoneUI();
+  // 해당 필드만 저장 — 상대방 동시 저장과 충돌 없음
+  fbSetField(currentDate,field,rec[field]||null);
+  renderMonthly();
+}
+
+function updateDoneUI(){
+  const rec=records[currentDate]||{};
+  const da=document.getElementById('done-a');
+  const db=document.getElementById('done-b');
+  if(da){
+    da.classList.toggle('checked-a',!!rec.aDone);
+    da.textContent=rec.aDone?'✅ 달성!':'☐ 오늘 목표 달성';
+  }
+  if(db){
+    db.classList.toggle('checked-b',!!rec.bDone);
+    db.textContent=rec.bDone?'✅ 달성!':'☐ 오늘 목표 달성';
+  }
+}
 async function saveDay(){
-  const rec={aIn:document.getElementById('a-in').value,aOut:document.getElementById('a-out').value,bIn:document.getElementById('b-in').value,bOut:document.getElementById('b-out').value};
+  // 기존 rec에서 aDone/bDone 등 시간 외 필드 보존
+  const prev=records[currentDate]||{};
+  const rec={
+    ...prev,
+    aIn:document.getElementById('a-in').value,
+    aOut:document.getElementById('a-out').value,
+    bIn:document.getElementById('b-in').value,
+    bOut:document.getElementById('b-out').value,
+  };
   records[currentDate]=rec;
   setSyncStatus('load');await fbSetRecord(currentDate,rec);setSyncStatus('ok');
   renderMonthly();showToast('저장됐어요 ✓  상대방 화면에도 반영됩니다');
@@ -652,11 +774,13 @@ function renderDaily(){
   const aOut=toMins(document.getElementById('a-out').value);
   const bIn=toMins(document.getElementById('b-in').value);
   const bOut=toMins(document.getElementById('b-out').value);
-  const lateMin=toMins(settings.lateAfter),earlyMin=toMins(settings.earlyBefore);
+  const th=getThresholds(currentDate);
+  const lateMinA=toMins(th.lateA),earlyMinA=toMins(th.earlyA);
+  const lateMinB=toMins(th.lateB),earlyMinB=toMins(th.earlyB);
   const vol=isVoluntary(currentDate);
   const checkAbsent=needsAttendance(currentDate);
-  renderFooter('a',aIn,aOut,lateMin,earlyMin,'badge-dur-a',checkAbsent,vol);
-  renderFooter('b',bIn,bOut,lateMin,earlyMin,'badge-dur-b',checkAbsent,vol);
+  renderFooter('a',aIn,aOut,lateMinA,earlyMinA,'badge-dur-a',checkAbsent,vol);
+  renderFooter('b',bIn,bOut,lateMinB,earlyMinB,'badge-dur-b',checkAbsent,vol);
   renderTimeline(aIn,aOut,bIn,bOut);
 }
 
@@ -714,7 +838,11 @@ function fillOverlap(id,aIn,aOut,bIn,bOut,tlS,total){
 }
 
 // ── FLAG HELPER ──────────────────────────────────────
-function getFlags(rec, who, lateMin, earlyMin, dateStr){
+function getFlags(rec, who, _lateMin, _earlyMin, dateStr){
+  // lateMin/earlyMin 인자 무시하고 이력 기반으로 계산
+  const th=getThresholds(dateStr);
+  const lateMin=toMins(who==='a'?th.lateA:th.lateB);
+  const earlyMin=toMins(who==='a'?th.earlyA:th.earlyB);
   const inKey=who==='a'?'aIn':'bIn', outKey=who==='a'?'aOut':'bOut';
   const inT=toMins(rec?rec[inKey]:null), outT=toMins(rec?rec[outKey]:null);
   const hasEntry=inT!==null||outT!==null;
@@ -737,7 +865,6 @@ function goThisMonth(){currentMonth=todayStr().slice(0,7);renderMonthly();}
 function renderMonthly(){
   const[y,m]=currentMonth.split('-').map(Number);
   document.getElementById('month-label').textContent=`${y}년 ${m}월`;
-  const lateMin=toMins(settings.lateAfter),earlyMin=toMins(settings.earlyBefore);
   const dim=new Date(y,m,0).getDate();
   let tA=0,tB=0,tOv=0,dA=0,dB=0,lA=0,lB=0,eA=0,eB=0,absA=0,absB=0;
 
@@ -757,10 +884,13 @@ function renderMonthly(){
       tOv+=Math.max(0,Math.min(aOut,bOut)-Math.max(aIn,bIn));
 
     if(!vol){
-      if(aIn!==null&&lateMin&&aIn>lateMin) lA++;
-      if(bIn!==null&&lateMin&&bIn>lateMin) lB++;
-      if(aOut!==null&&earlyMin&&aOut<earlyMin) eA++;
-      if(bOut!==null&&earlyMin&&bOut<earlyMin) eB++;
+      const th=getThresholds(key);
+      const lateMinA=toMins(th.lateA),earlyMinA=toMins(th.earlyA);
+      const lateMinB=toMins(th.lateB),earlyMinB=toMins(th.earlyB);
+      if(aIn!==null&&lateMinA&&aIn>lateMinA) lA++;
+      if(bIn!==null&&lateMinB&&bIn>lateMinB) lB++;
+      if(aOut!==null&&earlyMinA&&aOut<earlyMinA) eA++;
+      if(bOut!==null&&earlyMinB&&bOut<earlyMinB) eB++;
     }
 
     // [BUG 2+3 FIX] 결석 카운트: rec 유무가 아닌 실제 시간 입력 여부로 판단 → 통계와 배지 일치
@@ -775,11 +905,11 @@ function renderMonthly(){
     <div class="mstat"><div class="mstat-label">${settings.nameA}</div><div class="mstat-val" style="color:${aDark}">${dA?Math.floor(tA/60)+'h '+Math.round(tA%60)+'m':'—'}</div><div class="mstat-sub">${dA}일 · 지각 ${lA} · 조퇴 ${eA} · 결석 ${absA}</div></div>
     <div class="mstat"><div class="mstat-label">${settings.nameB}</div><div class="mstat-val" style="color:${bDark}">${dB?Math.floor(tB/60)+'h '+Math.round(tB%60)+'m':'—'}</div><div class="mstat-sub">${dB}일 · 지각 ${lB} · 조퇴 ${eB} · 결석 ${absB}</div></div>
     <div class="mstat"><div class="mstat-label">함께한 시간</div><div class="mstat-val" style="color:var(--overlap)">${tOv?Math.floor(tOv/60)+'h '+Math.round(tOv%60)+'m':'—'}</div><div class="mstat-sub">동시 참여 합계</div></div>`;
-  buildCalendar(y,m,aDark,bDark,lateMin,earlyMin);
-  buildMonthList(y,m,aDark,bDark,lateMin,earlyMin);
+  buildCalendar(y,m,aDark,bDark);
+  buildMonthList(y,m,aDark,bDark);
 }
 
-function buildCalendar(y,m,aDark,bDark,lateMin,earlyMin){
+function buildCalendar(y,m,aDark,bDark){
   const grid=document.getElementById('cal-grid');grid.innerHTML='';
   ['일','월','화','수','목','금','토'].forEach(d=>{const el=document.createElement('div');el.className='cal-day-label';el.textContent=d;grid.appendChild(el);});
   const firstDay=new Date(y,m-1,1).getDay(),dim=new Date(y,m,0).getDate(),today=todayStr();
@@ -820,18 +950,34 @@ function buildCalendar(y,m,aDark,bDark,lateMin,earlyMin){
     barsWrap.appendChild(mkBar(bIn,bOut,bDark,bLight));
     el.appendChild(barsWrap);
 
+    // done 아이콘 — 날짜 숫자 오른쪽에 나란히
+    if(rec?.aDone||rec?.bDone){
+      const doneWrap=document.createElement('div');doneWrap.className='cal-done-wrap';
+      if(rec.aDone){
+        const dot=document.createElement('div');dot.className='cal-done-dot';dot.title=settings.nameA+' 목표달성';
+        dot.innerHTML=`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" rx="2.5" fill="${aDark}"/><polyline points="2.2,5.2 4.2,7.2 7.8,3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        doneWrap.appendChild(dot);
+      }
+      if(rec.bDone){
+        const dot=document.createElement('div');dot.className='cal-done-dot';dot.title=settings.nameB+' 목표달성';
+        dot.innerHTML=`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10" rx="2.5" fill="${bDark}"/><polyline points="2.2,5.2 4.2,7.2 7.8,3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        doneWrap.appendChild(dot);
+      }
+      numDiv.appendChild(doneWrap);
+    }
+
     if(!vol){
       const bdg=document.createElement('div');bdg.className='cal-badges';
       const NA=badgeName(settings.nameA),NB=badgeName(settings.nameB);
-      mkBadge(bdg,getFlags(rec,'a',lateMin,earlyMin,key),NA);
-      mkBadge(bdg,getFlags(rec,'b',lateMin,earlyMin,key),NB);
+      mkBadge(bdg,getFlags(rec,'a',null,null,key),NA);
+      mkBadge(bdg,getFlags(rec,'b',null,null,key),NB);
       if(bdg.children.length)el.appendChild(bdg);
     }
     grid.appendChild(el);
   }
 }
 
-function buildMonthList(y,m,aDark,bDark,lateMin,earlyMin){
+function buildMonthList(y,m,aDark,bDark){
   const list=document.getElementById('month-list');list.innerHTML='';
   const dim=new Date(y,m,0).getDate();
   const tlS=toMins(settings.tlStart)||360,tlE=toMins(settings.tlEnd)||720,range=tlE-tlS;
@@ -870,8 +1016,8 @@ function buildMonthList(y,m,aDark,bDark,lateMin,earlyMin){
       return`background:linear-gradient(to right,${lt} ${sp}%,${dk} ${sp}%,${dk} ${ep}%,${lt} ${ep}%)`;
     }
 
-    const tagsA=vol?[]:getFlags(rec,'a',lateMin,earlyMin,key);
-    const tagsB=vol?[]:getFlags(rec,'b',lateMin,earlyMin,key);
+    const tagsA=vol?[]:getFlags(rec,'a',null,null,key);
+    const tagsB=vol?[]:getFlags(rec,'b',null,null,key);
 
     function tagHTML(tags,nm){
       return tags.map(t=>{
